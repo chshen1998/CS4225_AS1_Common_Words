@@ -15,7 +15,7 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.MultipleInputs;
-import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 public class TopkCommonWords {
@@ -75,8 +75,8 @@ public class TopkCommonWords {
         job.setReducerClass(IntMinReducer.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(IntWritable.class);
-        MultipleInputs.addInputPath(job, new Path(args[0]), FileInputFormat.class, TokenizerMapper.class);
-        MultipleInputs.addInputPath(job, new Path(args[1]), FileInputFormat.class, TokenizerMapper.class);
+        MultipleInputs.addInputPath(job, new Path(args[0]), TextInputFormat.class, TokenizerMapper.class);
+        MultipleInputs.addInputPath(job, new Path(args[1]), TextInputFormat.class, TokenizerMapper.class);
         FileOutputFormat.setOutputPath(job, new Path(args[3]));
         System.exit(job.waitForCompletion(true) ? 0 : 1);
     } 
