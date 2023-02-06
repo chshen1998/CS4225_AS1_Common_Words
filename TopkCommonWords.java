@@ -57,8 +57,8 @@ public class TopkCommonWords {
         public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
           int minVal = -1;
           for (IntWritable val : values) {
-            if (minVal == -1 || val < minVal) {
-                minVal = val;
+            if (minVal == -1 || val.get() < minVal) {
+                minVal = val.get();
             } 
           }
           result.set(minVal);
