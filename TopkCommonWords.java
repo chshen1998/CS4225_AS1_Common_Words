@@ -102,7 +102,7 @@ public class TopkCommonWords {
         }  
     }
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) throws Exception {
         Configuration conf = new Configuration();
 
         Scanner scanner = new Scanner(new File(args[2]));
