@@ -17,7 +17,7 @@ import java.util.Scanner;
 import java.util.Collections;
 import java.util.Comparator;
 
-import javafx.util.Pair;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
@@ -66,7 +66,7 @@ public class TopkCommonWords {
 
     public static class IntMinReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
         
-        private List<Pair<Integer, Text>> minCounts;
+        private List<ImmutablePair<Integer, Text>> minCounts;
 
         public void setup(Context context) throws IOException, InterruptedException {
           minCounts = new TreeMap<>();
@@ -84,13 +84,13 @@ public class TopkCommonWords {
           }
 
           if (counter == 2) {
-            minCounts.add(new Pair<Integer, Text>(smallest, new Text(key.toString())));
+            minCounts.add(new ImmutablePair<Integer, Text>(smallest, new Text(key.toString())));
           }
         }
 
         public void cleanup(Context context) throws IOException, InterruptedException {
           Collections.sort(minCounts, new Comparator<Pair<Integer, Text>>() {
-            public int compare(Pair<Integer, Text> word1, ImmutablePair<Integer, Text> word2) {
+            public int compare(ImmutablePair<Integer, Text> word1, ImmutablePair<Integer, Text> word2) {
                 return word1.getLeft() - word2.getLeft();
             }
         });
@@ -104,7 +104,7 @@ public class TopkCommonWords {
     public static void main(String[] args){
         Configuration conf = new Configuration();
 
-        Scanner scanner = new Scanner(new File(args[1]));
+        Scanner scanner = new Scanner(new File(args[2]));
         while (scanner.hasNextLine()) {
           String stopWord = scanner.nextLine();
           stopWords.add(stopWord);
