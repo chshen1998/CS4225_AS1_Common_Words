@@ -5,6 +5,7 @@ MATRICULATION NUMBER: A0200044E
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.HashSet;
 import java.util.HashMap;
@@ -64,12 +65,12 @@ public class TopkCommonWords {
       }
     }
 
-    public static class IntMinReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
+    public static class IntMinReducer extends Reducer<Text, IntWritable, IntWritable, Text> {
         
-        private List<ImmutablePair<Integer, Text>> minCounts;
+        private ArrayList<ImmutablePair<Integer, Text>> minCounts;
 
         public void setup(Context context) throws IOException, InterruptedException {
-          minCounts = new TreeMap<>();
+          minCounts = new ArrayList<>();
         }
 
         public void reduce(org.w3c.dom.Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
@@ -84,12 +85,12 @@ public class TopkCommonWords {
           }
 
           if (counter == 2) {
-            minCounts.add(new ImmutablePair<Integer, Text>(smallest, new Text(key.toString())));
+            minCounts.add(new ImmutablePair<Integer, Text>(minVal, new Text(key.toString())));
           }
         }
 
         public void cleanup(Context context) throws IOException, InterruptedException {
-          Collections.sort(minCounts, new Comparator<Pair<Integer, Text>>() {
+          Collections.sort(minCounts, new Comparator<ImmutablePair<Integer, Text>>() {
             public int compare(ImmutablePair<Integer, Text> word1, ImmutablePair<Integer, Text> word2) {
                 return word1.getLeft() - word2.getLeft();
             }
