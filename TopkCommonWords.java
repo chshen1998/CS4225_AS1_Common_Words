@@ -96,9 +96,9 @@ public class TopkCommonWords {
             }
         });
 
-        for (int i = 0; i < 10 && i < minCounts.size(); i++) {
-            context.write(new IntWritable(minCounts.get(i).getLeft()), minCounts.get(i).getRight());
-        }
+          for (int i = 0; i < 10 && i < minCounts.size(); i++) {
+              context.write(new IntWritable(minCounts.get(i).getLeft()), minCounts.get(i).getRight());
+          }
         }  
     }
 
@@ -109,6 +109,10 @@ public class TopkCommonWords {
         while (scanner.hasNextLine()) {
           String stopWord = scanner.nextLine();
           stopWords.add(stopWord);
+        }
+
+        for (String word: stopWords) {
+          System.out.println(word);
         }
 
         Job job = Job.getInstance(conf, "Top K Common Words");
