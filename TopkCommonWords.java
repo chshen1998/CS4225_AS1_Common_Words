@@ -18,8 +18,6 @@ import java.util.Scanner;
 import java.util.Collections;
 import java.util.Comparator;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
@@ -66,11 +64,11 @@ public class TopkCommonWords {
     }
 
     public static class IntMinReducer extends Reducer<Text, IntWritable, IntWritable, Text> {
-        
-        private ArrayList<ImmutablePair<Integer, Text>> minCounts;
+
+        private HashMap<Integer, List<String>> minCounts;
 
         public void setup(Context context) throws IOException, InterruptedException {
-          minCounts = new ArrayList<>();
+          minCounts = new HashMap<>();
         }
 
         public void reduce(org.w3c.dom.Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
@@ -85,20 +83,30 @@ public class TopkCommonWords {
           }
 
           if (counter == 2) {
-            minCounts.add(new ImmutablePair<Integer, Text>(minVal, new Text(key.toString())));
+            List<String> wordList = minCounts.get(minVal);
+            if (wordList == null) {
+              wordList = new ArrayList<String>();
+              wordList.add(key.toString());
+              minCounts.put(minVal, wordList);
+            } else {
+              wordList.add(key.toString());
+            }
           }
         }
 
         public void cleanup(Context context) throws IOException, InterruptedException {
-          Collections.sort(minCounts, new Comparator<ImmutablePair<Integer, Text>>() {
-            public int compare(ImmutablePair<Integer, Text> word1, ImmutablePair<Integer, Text> word2) {
-                return word1.getLeft() - word2.getLeft();
-            }
-        });
+          List<String> values;
+          int count = 0;
 
-          for (int i = 0; i < 10 && i < minCounts.size(); i++) {
-              context.write(new IntWritable(minCounts.get(i).getLeft()), minCounts.get(i).getRight());
-          }
+          minCounts.entrySet().stream()
+          .sorted(Map.Entry.<Integer, List<String>>comparingByKey())
+          .forEach(entry -> {
+            values = entry.getValue();
+            Collections.sort((values));
+            for (int i =0; i < values.size() && count < 10; i++) {
+              context.write(new IntWritable(entry.getKey()), new Text(values.get(i)));
+            }
+          });
         }  
     }
 
@@ -115,8 +123,8 @@ public class TopkCommonWords {
         job.setJarByClass(TopkCommonWords.class);
         job.setMapperClass(TokenizerMapper.class);
         job.setReducerClass(IntMinReducer.class);
-        job.setOutputKeyClass(Text.class);
-        job.setOutputValueClass(IntWritable.class);
+        job.setOutputKeyClass(IntWritable.class));
+        job.setOutputValueClass(Text.class);
         FileInputFormat.addInputPath(job, new Path(args[0]));
         FileInputFormat.addInputPath(job, new Path(args[1]));
         FileOutputFormat.setOutputPath(job, new Path(args[3]));
