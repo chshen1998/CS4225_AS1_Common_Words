@@ -95,16 +95,19 @@ public class TopkCommonWords {
         }
 
         public void cleanup(Context context) throws IOException, InterruptedException {
-          List<String> values;
           int count = 0;
 
           minCounts.entrySet().stream()
           .sorted(Map.Entry.<Integer, List<String>>comparingByKey())
           .forEach(entry -> {
-            values = entry.getValue();
-            Collections.sort((values));
-            for (int i =0; i < values.size() && count < 10; i++) {
-              context.write(new IntWritable(entry.getKey()), new Text(values.get(i)));
+            try {
+              List<String> values = entry.getValue();
+              Collections.sort((values));
+              for (int i =0; i < values.size() && count < 10; i++) {
+                context.write(new IntWritable(entry.getKey()), new Text(values.get(i)));
+              }              
+            } catch (IOException e) {
+              throw e;
             }
           });
         }  
@@ -123,7 +126,7 @@ public class TopkCommonWords {
         job.setJarByClass(TopkCommonWords.class);
         job.setMapperClass(TokenizerMapper.class);
         job.setReducerClass(IntMinReducer.class);
-        job.setOutputKeyClass(IntWritable.class));
+        job.setOutputKeyClass(IntWritable.class);
         job.setOutputValueClass(Text.class);
         FileInputFormat.addInputPath(job, new Path(args[0]));
         FileInputFormat.addInputPath(job, new Path(args[1]));
