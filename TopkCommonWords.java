@@ -111,10 +111,6 @@ public class TopkCommonWords {
           stopWords.add(stopWord);
         }
 
-        for (String word: stopWords) {
-          System.out.println(word);
-        }
-
         Job job = Job.getInstance(conf, "Top K Common Words");
         job.setJarByClass(TopkCommonWords.class);
         job.setMapperClass(TokenizerMapper.class);
