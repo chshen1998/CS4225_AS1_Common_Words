@@ -71,7 +71,7 @@ public class TopkCommonWords {
           minCounts = new HashMap<>();
         }
 
-        public void reduce(org.w3c.dom.Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
+        public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
           int counter = 0;
           int minVal = Integer.MAX_VALUE;
 
@@ -105,8 +105,10 @@ public class TopkCommonWords {
               Collections.sort((values));
               for (int i =0; i < values.size() && count < 10; i++) {
                 context.write(new IntWritable(entry.getKey()), new Text(values.get(i)));
+                count ++;
               }              
             } catch (IOException | InterruptedException e) {
+              System.out.println("Error in Reducer cleanup");
               e.printStackTrace();
             }
           });
@@ -125,6 +127,8 @@ public class TopkCommonWords {
         Job job = Job.getInstance(conf, "Top K Common Words");
         job.setJarByClass(TopkCommonWords.class);
         job.setMapperClass(TokenizerMapper.class);
+        job.setMapOutputKeyClass(Text.class);
+        job.setMapOutputValueClass(IntWritable.class);
         job.setReducerClass(IntMinReducer.class);
         job.setOutputKeyClass(IntWritable.class);
         job.setOutputValueClass(Text.class);
