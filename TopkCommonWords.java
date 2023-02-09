@@ -106,8 +106,8 @@ public class TopkCommonWords {
               for (int i =0; i < values.size() && count < 10; i++) {
                 context.write(new IntWritable(entry.getKey()), new Text(values.get(i)));
               }              
-            } catch (IOException e) {
-              throw e;
+            } catch (IOException | InterruptedException e) {
+              e.printStackTrace();
             }
           });
         }  
