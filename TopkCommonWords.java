@@ -100,7 +100,7 @@ public class TopkCommonWords {
           List<String> values = new ArrayList<>();
 
           minCounts.entrySet().stream()
-          .sorted(Map.Entry.<Integer, List<String>>comparingByKey())
+          .sorted(Collections.reverseOrder(Map.Entry.<Integer, List<String>>comparingByKey()))
           .forEach(entry -> {
               List<String> words = entry.getValue();
               Collections.sort((words));
