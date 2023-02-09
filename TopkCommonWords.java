@@ -101,6 +101,8 @@ public class TopkCommonWords {
           .sorted(Map.Entry.<Integer, List<String>>comparingByKey())
           .forEach(entry -> {
             try {
+              System.out.println(entry.getKey());
+              System.out.println(entry.getValue());
               List<String> values = entry.getValue();
               Collections.sort((values));
               for (int i =0; i < values.size() && count < 10; i++) {
