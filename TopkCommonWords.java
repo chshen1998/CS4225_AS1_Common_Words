@@ -32,6 +32,7 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 public class TopkCommonWords {
 
     private static Set<String> stopWords = new HashSet<String>();
+    private static int k;
 
     public static class TokenizerMapper extends Mapper<Object, Text, Text, IntWritable> {
 
@@ -103,7 +104,7 @@ public class TopkCommonWords {
           .forEach(entry -> {
               List<String> words = entry.getValue();
               Collections.sort((words));
-              for (int i =0; i < words.size() && keys.size() < 10; i++) {
+              for (int i =0; i < words.size() && keys.size() < k; i++) {
                 keys.add(entry.getKey());
                 values.add(words.get(i));
               }              
@@ -118,6 +119,8 @@ public class TopkCommonWords {
 
     public static void main(String[] args) throws Exception {
         Configuration conf = new Configuration();
+
+        k = Integer.parseInt(args[4]);
 
         Scanner scanner = new Scanner(new File(args[2]));
         while (scanner.hasNextLine()) {
