@@ -95,7 +95,8 @@ public class TopkCommonWords {
         }
 
         public void cleanup(Context context) throws IOException, InterruptedException {
-          int count = 0;
+          List<Integer> keys = new ArrayList<>();
+          List<List<String>> words = new ArrayList<>();
 
           minCounts.entrySet().stream()
           .sorted(Map.Entry.<Integer, List<String>>comparingByKey())
@@ -103,17 +104,22 @@ public class TopkCommonWords {
             try {
               System.out.println(entry.getKey());
               System.out.println(entry.getValue());
+              keys.add(entry.getKey());
               List<String> values = entry.getValue();
               Collections.sort((values));
-              for (int i =0; i < values.size() && count < 10; i++) {
-                context.write(new IntWritable(entry.getKey()), new Text(values.get(i)));
-                count ++;
-              }              
+              words.add(values);
             } catch (IOException | InterruptedException e) {
               System.out.println("Error in Reducer cleanup");
               e.printStackTrace();
             }
           });
+          
+          int count = 0;
+          for (int i=0; i < keys.size() && count < 10; i++) {
+            for (int j=0; j < words.get(i).size() && count < 10; j++) {
+              context.write(new IntWritable(keys.get(i)), new Text(words.get(i).get(j)));
+            }
+          }
         }  
     }
 
