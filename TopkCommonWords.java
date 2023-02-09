@@ -46,8 +46,9 @@ public class TopkCommonWords {
           StringTokenizer itr = new StringTokenizer(value.toString());
           while (itr.hasMoreTokens()) {
             String curr = itr.nextToken();
+            String lower = curr.toLowerCase();
 
-            if (!stopWords.contains(curr)) {
+            if (!stopWords.contains(lower)) {
               if (wordCount.containsKey(curr)) {
                 wordCount.put(curr, wordCount.get(curr) + 1);
               } else {
