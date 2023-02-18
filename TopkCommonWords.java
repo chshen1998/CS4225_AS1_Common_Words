@@ -46,11 +46,12 @@ public class TopkCommonWords {
           StringTokenizer itr = new StringTokenizer(value.toString());
           while (itr.hasMoreTokens()) {
             String curr = itr.nextToken();
-            if (curr.length() <= 4) {
+
+            if (curr.length() <= 4) { // Only words more than 4 characters long
               continue;
             }
             
-            if (!stopWords.contains(curr)) {
+            if (!stopWords.contains(curr)) { // Check that not a stopword
               if (wordCount.containsKey(curr)) {
                 wordCount.put(curr, wordCount.get(curr) + 1);
               } else {
@@ -86,7 +87,7 @@ public class TopkCommonWords {
             counter += 1;
           }
 
-          if (counter == 2) {
+          if (counter == 2) { // Check that word appears in both txt files
             List<String> wordList = minCounts.get(minVal);
             if (wordList == null) {
               wordList = new ArrayList<String>();
@@ -103,11 +104,11 @@ public class TopkCommonWords {
           List<String> values = new ArrayList<>();
 
           minCounts.entrySet().stream()
-          .sorted(Collections.reverseOrder(Map.Entry.<Integer, List<String>>comparingByKey()))
+          .sorted(Collections.reverseOrder(Map.Entry.<Integer, List<String>>comparingByKey())) // Sorts HashMap in reverse order by key
           .forEach(entry -> {
               List<String> words = entry.getValue();
-              Collections.sort((words));
-              for (int i =0; i < words.size() && keys.size() < k; i++) {
+              Collections.sort((words)); // Sort words with common frequency in alphabetical order
+              for (int i =0; i < words.size() && keys.size() < k; i++) { // Take only the top K words
                 keys.add(entry.getKey());
                 values.add(words.get(i));
               }              
@@ -123,14 +124,17 @@ public class TopkCommonWords {
     public static void main(String[] args) throws Exception {
         Configuration conf = new Configuration();
 
+        // Top k number of words to output
         k = Integer.parseInt(args[4]);
 
+        // Store stopwords in a HashSet
         Scanner scanner = new Scanner(new File(args[2]));
         while (scanner.hasNextLine()) {
           String stopWord = scanner.nextLine();
           stopWords.add(stopWord);
         }
 
+        // Configure MapReduce job
         Job job = Job.getInstance(conf, "Top K Common Words");
         job.setJarByClass(TopkCommonWords.class);
         job.setMapperClass(TokenizerMapper.class);
